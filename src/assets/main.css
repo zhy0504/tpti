@@ -90,13 +90,13 @@ img {
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-soft);
-  padding: 32rpx;
+  padding: 40rpx;
 }
 
 .hero-card {
   overflow: hidden;
   position: relative;
-  padding: 36rpx;
+  padding: 44rpx;
 }
 
 .hero-card::after {
@@ -114,7 +114,7 @@ img {
   background: rgba(255, 255, 255, 0.72);
   border-color: rgba(148, 163, 184, 0.12);
   box-shadow: none;
-  padding: 28rpx 32rpx;
+  padding: 32rpx 36rpx;
 }
 
 .badge {
@@ -214,13 +214,13 @@ img {
 .metrics-grid {
   display: flex;
   justify-content: space-between;
-  gap: 12rpx;
+  gap: 16rpx;
   margin-bottom: 20rpx;
 }
 
 .metric-card {
   flex: 1;
-  padding: 24rpx 12rpx;
+  padding: 28rpx 16rpx;
   border-radius: var(--radius-sm);
   background: var(--primary-lightest);
   text-align: center;
@@ -248,7 +248,19 @@ img {
 
 @media (min-width: 768px) {
   .app-shell {
-    padding: 36px 24px 56px;
+    padding: 36px 32px 56px;
+  }
+
+  .page {
+    max-width: 860px;
+  }
+
+  .card {
+    padding: 28px;
+  }
+
+  .hero-card {
+    padding: 32px;
   }
 
   .button-row,
@@ -261,6 +273,12 @@ img {
   .action-row > .button {
     width: auto;
     min-width: 170px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page {
+    max-width: 1000px;
   }
 }
 
