@@ -247,6 +247,25 @@ img {
   margin-top: 20rpx;
 }
 
+@media (max-width: 767px) {
+  .app-shell {
+    padding: 18px 16px 32px;
+  }
+
+  .card {
+    padding: 20px 18px;
+  }
+
+  .hero-card {
+    padding: 22px 20px;
+  }
+
+  .card--subtle,
+  .card--action {
+    padding: 18px 16px;
+  }
+}
+
 @media (min-width: 768px) {
   .app-shell {
     padding: 36px 32px 56px;
