@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="TB Prevention Knowledge Testing App Icon">
+  <title>TB Prevention Knowledge Testing</title>
+  <desc>A clean flat app icon with shield, lung, and checkmark symbol representing health protection and knowledge awareness for tuberculosis prevention</desc>
+
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F0FDFA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background: Rounded Square in Teal -->
+  <rect x="20" y="20" width="472" height="472" rx="108" ry="108" fill="#0D9488"/>
+
+  <!-- Shield Shape (white, centered) -->
+  <path d="M256 60
+           L376 104
+           L376 224
+           C376 320 256 420 256 420
+           C256 420 136 320 136 224
+           L136 104
+           Z"
+        fill="url(#shieldGrad)"/>
+
+  <!-- Shield subtle border -->
+  <path d="M256 60
+           L376 104
+           L376 224
+           C376 320 256 420 256 420
+           C256 420 136 320 136 224
+           L136 104
+           Z"
+        fill="none"
+        stroke="#14B8A6"
+        stroke-width="3"/>
+
+  <!-- Left Lung (rounded lobe shape) -->
+  <path d="M180 176
+           Q160 176 160 200
+           Q160 224 176 240
+           Q184 248 192 252
+           Q196 280 196 300
+           Q196 328 212 340
+           Q228 352 248 344
+           Q256 340 256 328
+           L256 280
+           Q256 260 248 252
+           Q240 244 232 236
+           Q224 220 224 200
+           Q224 176 200 176
+           Z"
+        fill="#0D9488"/>
+
+  <!-- Right Lung (rounded lobe shape) -->
+  <path d="M332 176
+           Q352 176 352 200
+           Q352 224 336 240
+           Q328 248 320 252
+           Q316 280 316 300
+           Q316 328 300 340
+           Q284 352 264 344
+           Q256 340 256 328
+           L256 280
+           Q256 260 264 252
+           Q272 244 280 236
+           Q288 220 288 200
+           Q288 176 312 176
+           Z"
+        fill="#0D9488"/>
+
+  <!-- Trachea (center column) -->
+  <rect x="242" y="136" width="28" height="48" rx="14" ry="14" fill="#0D9488"/>
+
+  <!-- Trachea branches to lungs -->
+  <path d="M248 184 Q236 192 228 208" fill="none" stroke="#0D9488" stroke-width="8" stroke-linecap="round"/>
+  <path d="M264 184 Q276 192 284 208" fill="none" stroke="#0D9488" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Check Mark (bold, indicating success) -->
+  <path d="M184 336
+           L220 372
+           L328 264"
+        fill="none"
+        stroke="#0D9488"
+        stroke-width="16"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Small decorative dots (quiz/knowledge dots) -->
+  <circle cx="96" cy="80" r="7" fill="#FFFFFF" opacity="0.3"/>
+  <circle cx="416" cy="80" r="7" fill="#FFFFFF" opacity="0.3"/>
+  <circle cx="96" cy="432" r="7" fill="#FFFFFF" opacity="0.3"/>
+  <circle cx="416" cy="432" r="7" fill="#FFFFFF" opacity="0.3"/>
+
+</svg>
