@@ -291,8 +291,9 @@ img {
 
   .button-row > .button,
   .action-row > .button {
-    width: auto;
-    min-width: 170px;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
   }
 }
 

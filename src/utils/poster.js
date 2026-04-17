@@ -191,20 +191,19 @@ async function createPosterCanvas(result, shareTitle) {
     ctx.fillText('结果图片', POSTER_WIDTH / 2, imageY + imageHeight / 2)
   }
 
-  // Badge
+  // Header title
   const badgeY = imageY + imageHeight + 32
-  ctx.fillStyle = COLORS.accent
-  ctx.beginPath()
-  ctx.roundRect(POSTER_WIDTH / 2 - 50, badgeY, 100, 24, 12)
-  ctx.fill()
-
   ctx.fillStyle = COLORS.primary
   ctx.font = 'bold 11px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText('TPTI 结果报告', POSTER_WIDTH / 2, badgeY + 16)
+  ctx.fillText('TPTI · Tuberculosis Prevention Type Indicator', POSTER_WIDTH / 2, badgeY + 8)
+
+  ctx.fillStyle = COLORS.text
+  ctx.font = 'bold 22px sans-serif'
+  ctx.fillText('防痨体质鉴定', POSTER_WIDTH / 2, badgeY + 38)
 
   // Result name
-  const nameY = badgeY + 44
+  const nameY = badgeY + 78
   ctx.fillStyle = COLORS.text
   ctx.font = 'bold 22px sans-serif'
   ctx.textAlign = 'center'

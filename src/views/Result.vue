@@ -294,10 +294,23 @@ async function shareResult() {
 }
 
 .result-actions .button {
+  width: 100%;
   height: 48px;
   line-height: 48px;
   font-size: 0.9375rem;
   font-weight: 600;
   border-radius: 12px;
+}
+
+@media (min-width: 768px) {
+  .result-actions {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .result-actions .button {
+    flex: 1;
+    min-width: 0;
+  }
 }
 </style>
