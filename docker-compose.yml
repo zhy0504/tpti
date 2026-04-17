@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  h5:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tpti-h5
+    ports:
+      - "8080:80"
+    restart: unless-stopped
