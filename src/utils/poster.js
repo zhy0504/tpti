@@ -12,6 +12,12 @@ const POSTER_WIDTH = 375
 const POSTER_HEIGHT = 667
 
 /**
+ * Export pixel ratio for high-definition output
+ * 2x = retina quality, sufficient for sharp sharing on phones
+ */
+const EXPORT_PIXEL_RATIO = 2
+
+/**
  * Color palette derived from existing design system
  */
 const COLORS = {
@@ -116,18 +122,24 @@ async function generateQRDataUrl(text, size = 120) {
  */
 async function createPosterCanvas(result, shareTitle) {
   const canvas = document.createElement('canvas')
-  canvas.width = POSTER_WIDTH
-  canvas.height = POSTER_HEIGHT
+  const exportWidth = POSTER_WIDTH * EXPORT_PIXEL_RATIO
+  const exportHeight = POSTER_HEIGHT * EXPORT_PIXEL_RATIO
+
+  canvas.width = exportWidth
+  canvas.height = exportHeight
+
   const ctx = canvas.getContext('2d')
+
+  // Scale context for high-resolution output
+  ctx.scale(EXPORT_PIXEL_RATIO, EXPORT_PIXEL_RATIO)
+
+  // Enable high-quality image rendering
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
 
   // Background gradient or solid color
   ctx.fillStyle = COLORS.white
   ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT)
-
-  // Top decorative bar
-  const topBarHeight = 8
-  ctx.fillStyle = COLORS.primary
-  ctx.fillRect(0, 0, POSTER_WIDTH, topBarHeight)
 
   // Result image
   const imageY = 24
