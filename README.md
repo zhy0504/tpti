@@ -48,6 +48,8 @@ docker run -d --name tpti-h5 -p 8080:80 tpti-h5
 
 ## docker-compose 使用
 
+`docker-compose.yml` 默认使用 GHCR 镜像：`ghcr.io/zhy0504/tpti-h5:latest`
+
 ```bash
 docker compose up -d
 ```
@@ -102,7 +104,7 @@ docker rm tpti-h5
 4. 执行
 
    ```bash
-   docker compose up -d --build
+   docker compose up -d
    ```
 
 5. 访问 `http://<VPS_IP>:8080`

@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   h5:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/zhy0504/tpti-h5:latest
     container_name: tpti-h5
     ports:
       - "8080:80"
