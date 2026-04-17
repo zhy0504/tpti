@@ -97,6 +97,17 @@ function loadImage(src) {
   })
 }
 
+function shouldPreferDirectDownload() {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  const hasCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false
+  const isWideScreen = window.innerWidth >= 1024
+
+  return !hasCoarsePointer && isWideScreen
+}
+
 /**
  * Generate QR code as a data URL
  * @param {string} text - Text to encode in QR
@@ -346,6 +357,11 @@ export async function sharePoster(result, shareTitle) {
   try {
     // Generate poster canvas
     const canvas = await createPosterCanvas(result, shareTitle)
+
+    if (shouldPreferDirectDownload()) {
+      await downloadCanvas(canvas)
+      return { success: true, message: '已下载高清海报图片，请直接发送该图片' }
+    }
 
     // Try native share with file first
     const blob = await canvasToBlob(canvas)
