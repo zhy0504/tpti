@@ -75,7 +75,8 @@ img {
 }
 
 .page {
-  width: min(100%, 760px);
+  width: 100%;
+  max-width: 760px;
   margin: 0 auto;
 }
 
@@ -273,6 +274,18 @@ img {
   .action-row > .button {
     width: auto;
     min-width: 170px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page {
+    max-width: 1040px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .page {
+    max-width: 1160px;
   }
 }
 
