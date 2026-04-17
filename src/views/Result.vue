@@ -74,6 +74,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ResultCard from '@/components/ResultCard.vue'
 import { buildShareTitle } from '@/utils/share.js'
+import { sharePoster } from '@/utils/poster.js'
 import { getLastResult } from '@/utils/storage.js'
 
 const router = useRouter()
@@ -118,7 +119,13 @@ async function shareResult() {
   }
 
   const shareTitle = buildShareTitle(result.value.resultName, result.value.levelTitle, result.value.resultType)
-  const shareUrl = `${window.location.origin}${window.location.pathname}#/${''}`
+  const { success, message } = await sharePoster(result.value, shareTitle)
+  if (success) {
+    feedbackMessage.value = message
+    return
+  }
+
+  const shareUrl = `${window.location.origin}${window.location.pathname}#/`
 
   if (navigator.share) {
     await navigator.share({
@@ -131,12 +138,12 @@ async function shareResult() {
   }
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    await navigator.clipboard.writeText(shareTitle)
-    feedbackMessage.value = '当前设备不支持系统分享，已复制分享文案。'
+    await navigator.clipboard.writeText(`${shareTitle} ${shareUrl}`)
+    feedbackMessage.value = '海报生成失败，已复制分享文案和链接。'
     return
   }
 
-  feedbackMessage.value = '当前环境暂不支持系统分享，请手动复制页面链接。'
+  feedbackMessage.value = message || '当前环境暂不支持系统分享，请手动复制页面链接。'
 }
 </script>
 
