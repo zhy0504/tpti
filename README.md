@@ -62,6 +62,33 @@ docker compose down
 
 ---
 
+## GHCR 镜像使用
+
+GitHub Actions 会自动构建并发布 `linux/amd64` 镜像到 GHCR：`ghcr.io/zhy0504/tpti-h5`
+
+### 拉取镜像
+
+```bash
+docker pull ghcr.io/zhy0504/tpti-h5:latest
+```
+
+### 运行容器
+
+```bash
+docker run -d --name tpti-h5 -p 8080:80 ghcr.io/zhy0504/tpti-h5:latest
+```
+
+访问 http://localhost:8080
+
+停止并删除容器：
+
+```bash
+docker stop tpti-h5
+docker rm tpti-h5
+```
+
+---
+
 ## VPS 部署流程
 
 1. 将整个项目上传至 VPS，或在 VPS 上 clone 仓库
