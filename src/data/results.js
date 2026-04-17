@@ -4,7 +4,7 @@ export const results = {
       type: "action_guard",
       name: "金钟罩体质",
       imagePath: "/img/金钟罩体质.webp",
-      oneLiner: "你不仅是分高，关键时刻的行动更是稳如老狗，堪称朋友圈的结防卫士！",
+      oneLiner: "你不仅是分高，关键时刻更是抗击结核的C位担当，堪称朋友圈的结防卫士！",
       summary: "如果把防结核这件事当成一场状态测试，你已经属于那种会看重点、也会真去做的人。传播方式、症状识别、及时就医和规范治疗这些关键点，你基本都在线。",
       tags: ["传播认知在线", "症状判断靠谱", "行动意识较强"],
       suggestions: [
@@ -15,8 +15,8 @@ export const results = {
     },
     {
       type: "knowledge_online",
-      name: "嘴强王者体质",
-      imagePath: "/img/嘴强王者体质.webp",
+      name: "理论派体质",
+      imagePath: "/img/理论派体质.webp",
       oneLiner: "理论题库倒背如流，但实操起来略显随缘，你的防线还有点漏风哦。",
       summary: "你的防结核知识储备已经不低了，很多关键点你都答得出来，也说明平时不是完全没关注过这件事。现在差的不是知道，而是把这些知识更快地用到行动判断上。",
       tags: ["基础知识不错", "理解力在线", "行动细节待加强"],
