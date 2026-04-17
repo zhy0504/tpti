@@ -28,17 +28,14 @@ npm run build
 
 ---
 
-## Docker 构建与运行
+## Docker 部署
 
-### 构建镜像
+### A. 本地构建与运行
+
+从源码构建镜像：
 
 ```bash
 docker build -t tpti-h5 .
-```
-
-### 运行容器
-
-```bash
 docker run -d --name tpti-h5 -p 8080:80 tpti-h5
 ```
 
@@ -46,9 +43,11 @@ docker run -d --name tpti-h5 -p 8080:80 tpti-h5
 
 ---
 
-## docker-compose 使用
+### B. GHCR 镜像部署
 
-`docker-compose.yml` 默认使用 GHCR 镜像：`ghcr.io/zhy0504/tpti-h5:latest`
+`docker-compose.yml` 默认使用 GHCR 镜像 `ghcr.io/zhy0504/tpti-h5:latest`。
+
+**方式一：docker compose（推荐）**
 
 ```bash
 docker compose up -d
@@ -62,21 +61,10 @@ docker compose up -d
 docker compose down
 ```
 
----
-
-## GHCR 镜像使用
-
-GitHub Actions 会自动构建并发布 `linux/amd64` 镜像到 GHCR：`ghcr.io/zhy0504/tpti-h5`
-
-### 拉取镜像
+**方式二：docker pull + docker run**
 
 ```bash
 docker pull ghcr.io/zhy0504/tpti-h5:latest
-```
-
-### 运行容器
-
-```bash
 docker run -d --name tpti-h5 -p 8080:80 ghcr.io/zhy0504/tpti-h5:latest
 ```
 
@@ -93,23 +81,24 @@ docker rm tpti-h5
 
 ## VPS 部署流程
 
-1. 将整个项目上传至 VPS，或在 VPS 上 clone 仓库
-2. 进入项目根目录
+1. 将项目上传至 VPS，或在 VPS 上 clone 仓库
+2. 进入项目目录
 
    ```bash
    cd tpti
    ```
 
 3. 确保已安装 Docker 和 Docker Compose
-4. 执行
+4. 拉取最新镜像并启动服务
 
    ```bash
+   docker compose pull
    docker compose up -d
    ```
 
 5. 访问 `http://<VPS_IP>:8080`
 
-如需修改映射端口，编辑 `docker-compose.yml` 中的 `ports` 配置后重新部署。
+如需修改映射端口，编辑 `docker-compose.yml` 中的 `ports` 配置后重新执行第 4 步。
 
 ---
 
