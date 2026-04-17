@@ -3,7 +3,7 @@ export const results = {
     {
       type: "action_guard",
       name: "金钟罩体质",
-      imagePath: "/img/金钟罩体质.png",
+      imagePath: "/img/金钟罩体质.webp",
       oneLiner: "你不仅是分高，关键时刻的行动更是稳如老狗，堪称朋友圈的结防卫士！",
       summary: "如果把防结核这件事当成一场状态测试，你已经属于那种会看重点、也会真去做的人。传播方式、症状识别、及时就医和规范治疗这些关键点，你基本都在线。",
       tags: ["传播认知在线", "症状判断靠谱", "行动意识较强"],
@@ -16,7 +16,7 @@ export const results = {
     {
       type: "knowledge_online",
       name: "嘴强王者体质",
-      imagePath: "/img/嘴强王者体质.png",
+      imagePath: "/img/嘴强王者体质.webp",
       oneLiner: "理论题库倒背如流，但实操起来略显随缘，你的防线还有点漏风哦。",
       summary: "你的防结核知识储备已经不低了，很多关键点你都答得出来，也说明平时不是完全没关注过这件事。现在差的不是知道，而是把这些知识更快地用到行动判断上。",
       tags: ["基础知识不错", "理解力在线", "行动细节待加强"],
@@ -29,7 +29,7 @@ export const results = {
     {
       type: "steady_learner",
       name: "养成系体质",
-      imagePath: "/img/养成系体质.png",
+      imagePath: "/img/养成系体质.webp",
       oneLiner: "你的防痨意识正在稳步发育中，苟住！继续叠甲就能晋升王者。",
       summary: '你现在属于"基础已经打了，但细节还没完全补齐"的状态。很多防结核常识你并不陌生，只是到了传播方式、预防细节和治疗认知这些地方，偶尔还是会被小坑绊一下。',
       tags: ["基础尚可", "容易漏细节", "提升空间明确"],
@@ -42,7 +42,7 @@ export const results = {
     {
       type: "pitfall_tripper",
       name: "精准踩雷体质",
-      imagePath: "/img/精准踩雷体质.png",
+      imagePath: "/img/精准踩雷体质.webp",
       oneLiner: "危险！你几乎精准踩中了每一个预防雷区，不要再听信偏方啦！",
       summary: '你不是不在意防结核，而是特别容易被那些"听起来像真的"说法带偏。尤其到了传播方式、日常防护和常见误区这里，你的知识判断还不够稳，所以才会一脚踩坑。',
       tags: ["容易被误导", "防护认知不稳", "误区较多"],
@@ -55,7 +55,7 @@ export const results = {
     {
       type: "delay_observer",
       name: "忍者硬抗体质",
-      imagePath: "/img/忍者硬抗体质.png",
+      imagePath: "/img/忍者硬抗体质.webp",
       oneLiner: '剧烈咳嗽还想再等等看？主打一个硬扛，你是真"忍者"啊，快去医院排查！',
       summary: '你最大的问题不是完全不知道，而是总觉得"再等等也没事"。可放在防结核这件事里，持续咳嗽、咳痰这些信号不太适合一直观望，很多时候早点判断、早点检查更重要。',
       tags: ["就医判断偏慢", "症状警惕不足", "行动时机需加强"],
@@ -68,7 +68,7 @@ export const results = {
     {
       type: "need_recharge",
       name: "脆皮裸奔体质",
-      imagePath: "/img/脆皮裸奔体质.png",
+      imagePath: "/img/脆皮裸奔体质.webp",
       oneLiner: "毫无防备的脆皮玩家！在结核分枝杆菌面前你处于零防御状态，急需回炉重造。",
       summary: "你现在的防结核知识库还在待更新状态，但这不是什么坏事，反而说明这套测试做得刚刚好。只要把传播、症状、就医和规范治疗这些关键点补上，很多常见误区以后都能直接绕开。",
       tags: ["基础较弱", "需要集中补课", "进步空间很大"],
