@@ -1,4 +1,5 @@
-const TOTAL_QUESTIONS = 12
+const TOTAL_QUESTIONS = 10
+const QUESTIONS_PER_DIMENSION = 2
 
 const DIMENSIONS = {
   knowledge_basic: "knowledge_basic",
@@ -572,8 +573,9 @@ const questions = [
 ]
 
 export const quiz = {
-  version: "1.2.0",
+  version: "1.3.0",
   totalQuestions: TOTAL_QUESTIONS,
+  questionsPerDimension: QUESTIONS_PER_DIMENSION,
   dimensions: Object.values(DIMENSIONS),
   questions
 }

@@ -23,7 +23,10 @@ const QUIZ_RESULT_KEY = "tb_quiz_last_result"
 function safeJsonParse(value) {
   if (value === null || value === undefined) return null
   try {
-    return JSON.parse(value)
+    const parsed = JSON.parse(value)
+    // Reject JSON primitives that are valid but meaningless as storage values
+    if (parsed === null || typeof parsed !== "object") return null
+    return parsed
   } catch {
     return null
   }
@@ -38,6 +41,7 @@ function safeJsonParse(value) {
 function setStorageSync(key, data) {
   try {
     const serialized = JSON.stringify(data)
+    // QuotaExceededError can still be thrown even after successful stringify
     localStorage.setItem(key, serialized)
   } catch (error) {
     console.warn(`[Storage] Failed to set "${key}":`, error)
@@ -117,6 +121,13 @@ function getLastResult() {
   return getStorageSync(QUIZ_RESULT_KEY)
 }
 
+/**
+ * Clear last quiz result
+ */
+function clearLastResult() {
+  removeStorageSync(QUIZ_RESULT_KEY)
+}
+
 export {
   QUIZ_SESSION_KEY,
   QUIZ_RESULT_KEY,
@@ -127,7 +138,8 @@ export {
   getSession,
   clearSession,
   saveLastResult,
-  getLastResult
+  getLastResult,
+  clearLastResult
 }
 
 export default {
@@ -140,5 +152,6 @@ export default {
   getSession,
   clearSession,
   saveLastResult,
-  getLastResult
+  getLastResult,
+  clearLastResult
 }

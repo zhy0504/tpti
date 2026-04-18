@@ -1,43 +1,38 @@
 <template>
   <div class="app-shell">
-    <main class="page page-stack">
-      <section class="card hero-card">
-        <div class="hero">
+    <main class="page page-stack home-page">
+      <section class="card hero-card home-hero-card">
+        <div class="home-hero-stack">
           <div class="badge">{{ config.activityBadge }}</div>
+
           <h1 class="hero-title">{{ config.title }}</h1>
-          <p class="hero-subtitle">{{ config.subtitle }}</p>
-        </div>
 
-        <div class="metrics-grid">
-          <article class="metric-card">
-            <div class="metric-value">{{ quiz.totalQuestions }}题</div>
-            <div class="metric-label">快速完成</div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-value">约3分钟</div>
-            <div class="metric-label">轻量测试</div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-value">类型+得分</div>
-            <div class="metric-label">类型与得分</div>
-          </article>
-        </div>
+          <dl class="metrics-grid home-metrics-grid">
+            <div class="metric-card">
+              <dt class="metric-value">{{ quiz.totalQuestions }}题</dt>
+              <dd class="metric-label">覆盖多类防治知识重点</dd>
+            </div>
+            <div class="metric-card">
+              <dt class="metric-value">约3分钟</dt>
+              <dd class="metric-label">即可完成一次清晰回顾</dd>
+            </div>
+            <div class="metric-card">
+              <dt class="metric-value">完成即看</dt>
+              <dd class="metric-label">结果类型、知识水平与重点建议</dd>
+            </div>
+          </dl>
 
-        <div class="button-row">
-          <button class="button button-primary" type="button" @click="onStart">
-            {{ startButtonText }}
-          </button>
-          <button class="button button-secondary" type="button" @click="secondaryAction">
-            {{ secondaryButtonText }}
-          </button>
+          <div class="button-row hero-actions">
+            <button class="button button-primary" type="button" @click="onStart">
+              {{ startButtonText }}
+            </button>
+            <button v-if="hasSession" class="button button-secondary" type="button" @click="restartQuiz">
+              重新开始评估
+            </button>
+          </div>
         </div>
       </section>
 
-      <section class="card card--subtle">
-        <div class="notice-title">测试说明</div>
-        <p class="notice-text">本测试用于帮助你了解自己的结核防治知识掌握情况与行动倾向，结果仅供科普参考。</p>
-        <p class="text-muted disclaimer">{{ config.disclaimer }}</p>
-      </section>
     </main>
   </div>
 </template>
@@ -47,6 +42,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { pageConfig } from '@/data/page-config.js'
 import { quiz } from '@/data/quiz.js'
+import { matchesQuizConfig } from '@/utils/quizSelection.js'
 import { clearSession, getSession } from '@/utils/storage.js'
 
 const router = useRouter()
@@ -55,36 +51,135 @@ const hasSession = ref(false)
 
 const startButtonText = computed(() => {
   if (hasSession.value) {
-    return '继续答题'
+    return '继续作答'
   }
 
   return config.startButtonText
 })
 
-const secondaryButtonText = computed(() => {
-  if (hasSession.value) {
-    return '换个状态重测'
+onMounted(() => {
+  const session = getSession()
+
+  if (!matchesQuizConfig(session, quiz)) {
+    clearSession()
+    hasSession.value = false
+    return
   }
 
-  return config.introButtonText
-})
-
-onMounted(() => {
-  hasSession.value = Boolean(getSession())
+  hasSession.value = true
 })
 
 function onStart() {
   router.push('/quiz')
 }
 
-function secondaryAction() {
-  if (hasSession.value) {
-    clearSession()
-    hasSession.value = false
-    router.push('/quiz')
-    return
-  }
-
-  router.push('/intro')
+function restartQuiz() {
+  clearSession()
+  hasSession.value = false
+  router.push('/quiz')
 }
 </script>
+
+<style scoped>
+.home-page {
+  min-height: calc(100vh - 112px);
+  justify-content: center;
+}
+
+.home-hero-card {
+  padding: 32px 30px;
+}
+
+.home-hero-stack {
+  display: grid;
+  gap: 22px;
+  justify-items: center;
+  text-align: center;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+  margin: 0;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-height: 104px;
+  padding: 20px 18px;
+  border-radius: calc(var(--radius-sm) + 2px);
+  background: linear-gradient(180deg, rgba(240, 253, 250, 0.88) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border: 1px solid var(--border-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  text-align: center;
+}
+
+.home-hero-stack > .badge {
+  justify-self: center;
+  font-size: 0.9375rem;
+  padding: 10px 18px;
+}
+
+.home-hero-stack .hero-title {
+  max-width: 8.5em;
+  margin: 0;
+  font-size: clamp(1.65rem, 2.7vw, 2.2rem);
+  line-height: 1.18;
+}
+
+.home-metrics-grid {
+  width: 100%;
+}
+
+.metric-value {
+  margin: 0;
+  font-size: 1.1875rem;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+.metric-label {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  width: 100%;
+  max-width: 24rem;
+  margin-top: 2px;
+}
+
+@media (min-width: 960px) {
+  .home-page {
+    min-height: calc(100vh - 136px);
+  }
+
+  .home-hero-card {
+    padding: 40px 42px;
+  }
+}
+
+@media (max-width: 767px) {
+  .home-page {
+    min-height: auto;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .home-hero-card {
+    padding: 22px 18px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

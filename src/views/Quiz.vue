@@ -1,37 +1,51 @@
 <template>
   <div class="app-shell">
-    <main class="page page-stack">
-      <ProgressBar :current="currentDisplayIndex" :total="selectedQuestions.length || quizData.totalQuestions" :percent="progressPercent" />
+    <main class="page page-stack quiz-page">
+      <section class="quiz-overview">
+        <div class="quiz-progress-panel">
+          <ProgressBar
+            :current="currentDisplayIndex"
+            :total="selectedQuestions.length || quizData.totalQuestions"
+            :percent="progressPercent"
+          />
+        </div>
+      </section>
 
-      <div class="card">
-        <QuestionCard
-          v-if="currentQuestion"
-          :question="currentQuestion"
-          :selected-option-key="selectedOptionKey"
-          @select="handleSelect"
-        />
+      <section class="card quiz-card">
+        <div class="quiz-card-body">
+          <QuestionCard
+            v-if="currentQuestion"
+            :question="currentQuestion"
+            :selected-option-key="selectedOptionKey"
+            @select="handleSelect"
+          />
 
-        <section v-else class="empty-state">
-          <h2 class="title-lg">题目准备中</h2>
-          <p class="text-body">正在为你装载本轮题目，请稍候。</p>
-        </section>
-      </div>
+          <section v-else class="empty-state">
+            <h2 class="title-lg">题目准备中</h2>
+            <p class="text-body">正在为你装载本轮题目，请稍候。</p>
+          </section>
+        </div>
 
-      <section v-if="statusMessage" class="status-note">{{ statusMessage }}</section>
+        <div class="divider quiz-card-divider"></div>
 
-      <div class="footer-actions">
-        <button class="button button-ghost nav-btn" type="button" :disabled="currentIndex === 0" @click="goPrevious">
-          上一题
-        </button>
-        <button
-          class="button button-primary nav-btn"
-          type="button"
-          :disabled="!selectedOptionKey"
-          @click="goNextOrSubmit"
-        >
-          {{ nextButtonText }}
-        </button>
-      </div>
+        <div class="quiz-footer">
+          <div class="footer-actions">
+            <button class="button button-ghost nav-btn" type="button" :disabled="currentIndex === 0" @click="goPrevious">
+              上一题
+            </button>
+            <button
+              class="button button-primary nav-btn"
+              type="button"
+              :disabled="!selectedOptionKey"
+              @click="goNextOrSubmit"
+            >
+              {{ nextButtonText }}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="statusMessage" class="status-note quiz-status-note">{{ statusMessage }}</section>
     </main>
   </div>
 </template>
@@ -44,6 +58,7 @@ import QuestionCard from '@/components/QuestionCard.vue'
 import { quiz as quizData } from '@/data/quiz.js'
 import { results } from '@/data/results.js'
 import { calculateQuizResult } from '@/utils/calcResult.js'
+import { matchesQuizConfig, selectBalancedQuestions } from '@/utils/quizSelection.js'
 import { clearSession, getSession, saveLastResult, saveSession } from '@/utils/storage.js'
 
 const router = useRouter()
@@ -54,11 +69,6 @@ const statusMessage = ref('')
 
 const currentQuestion = computed(() => selectedQuestions.value[currentIndex.value] ?? null)
 const currentDisplayIndex = computed(() => currentIndex.value + 1)
-const answeredCount = computed(() => userAnswers.value.length)
-const unansweredCount = computed(() => {
-  const total = selectedQuestions.value.length || quizData.totalQuestions
-  return total - answeredCount.value
-})
 const progressPercent = computed(() => {
   const total = selectedQuestions.value.length || quizData.totalQuestions
   if (!total) {
@@ -99,6 +109,8 @@ function restoreOrInitializeQuiz() {
     return
   }
 
+  clearSession()
+
   initializeQuiz()
 }
 
@@ -115,28 +127,43 @@ function isValidSession(session) {
     return false
   }
 
+  if (!matchesQuizConfig(session, quizData)) {
+    return false
+  }
+
+  if (session.currentIndex < 0 || session.currentIndex >= session.questions.length) {
+    return false
+  }
+
+  const everyQuestionValid = session.questions.every((question) => {
+    return question && question.id !== undefined && Array.isArray(question.options) && question.options.length > 0
+  })
+
+  if (!everyQuestionValid) {
+    return false
+  }
+
+  const allAnswersMatchQuestions = session.userAnswers.every((answer) => {
+    return answer && session.questions.some((question) => question.id === answer.questionId)
+  })
+
+  if (!allAnswersMatchQuestions) {
+    return false
+  }
+
   return true
 }
 
 function initializeQuiz() {
-  selectedQuestions.value = shuffleQuestions(quizData.questions).slice(0, quizData.totalQuestions)
+  selectedQuestions.value = selectBalancedQuestions(
+    quizData.questions,
+    quizData.dimensions,
+    quizData.questionsPerDimension
+  )
   currentIndex.value = 0
   userAnswers.value = []
   statusMessage.value = ''
   persistSession()
-}
-
-function shuffleQuestions(source) {
-  const copied = [...source]
-
-  for (let index = copied.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1))
-    const current = copied[index]
-    copied[index] = copied[swapIndex]
-    copied[swapIndex] = current
-  }
-
-  return copied
 }
 
 function handleSelect(payload) {
@@ -166,7 +193,7 @@ function goPrevious() {
 
 function goNextOrSubmit() {
   if (!selectedOptionKey.value) {
-    statusMessage.value = '请先选择一个答案，再继续。'
+    statusMessage.value = '请选择一个答案后继续。'
     return
   }
 
@@ -192,16 +219,14 @@ function submitQuiz() {
 
   saveLastResult({
     ...result,
+    quizVersion: quizData.version,
+    totalQuestions: quizData.totalQuestions,
+    questionsPerDimension: quizData.questionsPerDimension,
     questions: selectedQuestions.value,
     userAnswers: userAnswers.value
   })
   clearSession()
   router.push('/result')
-}
-
-function restartQuiz() {
-  clearSession()
-  initializeQuiz()
 }
 
 function persistSession() {
@@ -210,6 +235,9 @@ function persistSession() {
   }
 
   saveSession({
+    quizVersion: quizData.version,
+    totalQuestions: quizData.totalQuestions,
+    questionsPerDimension: quizData.questionsPerDimension,
     questions: selectedQuestions.value,
     currentIndex: currentIndex.value,
     userAnswers: userAnswers.value
@@ -218,19 +246,110 @@ function persistSession() {
 </script>
 
 <style scoped>
+.quiz-page {
+  max-width: var(--page-max-lg);
+}
+
+.quiz-overview {
+  min-width: 0;
+}
+
+.quiz-progress-panel {
+  min-width: 0;
+}
+
+.quiz-card {
+  display: grid;
+  gap: 24px;
+}
+
+.quiz-card-body {
+  min-width: 0;
+}
+
+.quiz-card-divider {
+  margin-top: -2px;
+}
+
+.quiz-footer {
+  display: flex;
+  justify-content: center;
+}
+
 .footer-actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
-  margin-top: 18px;
-  padding-bottom: 10px;
+  margin-top: 0;
+  padding-bottom: 0;
 }
 
 .nav-btn {
-  flex: 1;
-  height: 48px;
-  line-height: 48px;
+  width: 100%;
+  min-height: 54px;
+  line-height: 1.4;
+  padding: 0 20px;
   font-size: 0.9375rem;
   font-weight: 600;
-  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.quiz-status-note {
+  margin-top: -4px;
+}
+
+:deep(.progress-wrap) {
+  margin-bottom: 0;
+  min-height: 100%;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-medium);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+}
+
+:deep(.progress-head) {
+  margin-bottom: 12px;
+}
+
+:deep(.progress-text) {
+  color: var(--text-secondary);
+}
+
+:deep(.track) {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+@media (min-width: 768px) {
+  .footer-actions {
+    flex-direction: row;
+    width: min(100%, 26rem);
+  }
+
+  .nav-btn {
+    flex: 1;
+  }
+}
+
+@media (min-width: 960px) {
+  .quiz-card {
+    gap: 28px;
+  }
+
+  .quiz-card-body {
+    max-width: 50rem;
+  }
+
+  .footer-actions {
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .footer-actions .nav-btn {
+    flex: 1 1 0;
+  }
 }
 </style>
