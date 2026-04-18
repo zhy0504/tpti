@@ -44,28 +44,28 @@ function emitSelect(key) {
 }
 
 .question-title {
-  margin: 0 0 16px;
-  font-size: 1.0625rem;
+  margin: 0 0 18px;
+  font-size: 1.125rem;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.65;
   color: #0f172a;
 }
 
 .option-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .option-item {
   width: 100%;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 14px;
+  padding: 16px 18px;
   border: 1.5px solid #e2e8f0;
-  border-radius: 12px;
-  background: #f8fafc;
+  border-radius: 14px;
+  background: #fbfdff;
   text-align: left;
   color: var(--text-primary);
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
@@ -73,20 +73,20 @@ function emitSelect(key) {
 
 .option-item--active {
   background: #f0fdfa;
-  border-color: #14b8a6;
-  box-shadow: 0 2px 10px rgba(20, 184, 166, 0.12);
+  border-color: #0f9f96;
+  box-shadow: 0 6px 18px rgba(20, 184, 166, 0.12);
 }
 
 .option-key {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #e2e8f0;
   color: #0f766e;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -98,8 +98,14 @@ function emitSelect(key) {
 
 .option-text {
   flex: 1;
-  line-height: 1.6;
+  line-height: 1.7;
   color: #334155;
   font-size: 0.9375rem;
+}
+
+@media (max-width: 560px) {
+  .option-item {
+    padding: 15px 16px;
+  }
 }
 </style>

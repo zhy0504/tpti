@@ -1,7 +1,10 @@
 <template>
   <div class="progress-wrap">
     <div class="progress-head">
-      <p class="progress-text">第 {{ current }} / {{ total }} 题</p>
+      <div class="progress-copy">
+        <p class="progress-label">答题进度</p>
+        <p class="progress-text">第 {{ current }} 题 / 共 {{ total }} 题</p>
+      </div>
       <p class="progress-percent">{{ safePercent }}%</p>
     </div>
 
@@ -45,32 +48,52 @@ const safePercent = computed(() => {
 <style scoped>
 .progress-wrap {
   margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 118, 110, 0.08);
+  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.05);
 }
 
 .progress-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.progress-copy {
+  min-width: 0;
+}
+
+.progress-label {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0f766e;
 }
 
 .progress-text {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #334155;
+  line-height: 1.5;
 }
 
 .progress-percent {
   margin: 0;
-  font-size: 0.75rem;
+  flex-shrink: 0;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #0f766e;
 }
 
 .track {
-  height: 5px;
-  background: #e2e8f0;
+  height: 8px;
+  background: #dbe7ef;
   border-radius: 999px;
   overflow: hidden;
 }
@@ -80,5 +103,15 @@ const safePercent = computed(() => {
   background: linear-gradient(90deg, #0d9488 0%, #14b8a6 100%);
   border-radius: 999px;
   transition: width 0.3s ease;
+}
+
+@media (max-width: 560px) {
+  .progress-wrap {
+    padding: 12px 14px;
+  }
+
+  .progress-head {
+    align-items: center;
+  }
 }
 </style>

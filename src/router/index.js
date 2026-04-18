@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
-import Intro from '@/views/Intro.vue'
 import Quiz from '@/views/Quiz.vue'
 import Result from '@/views/Result.vue'
 import Knowledge from '@/views/Knowledge.vue'
@@ -14,7 +13,7 @@ const routes = [
   {
     path: '/intro',
     name: 'Intro',
-    component: Intro
+    redirect: '/'
   },
   {
     path: '/quiz',
