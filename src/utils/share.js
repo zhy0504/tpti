@@ -4,13 +4,15 @@
  */
 
 const SHARE_TITLE_MAP = {
-  action_guard: "我测出了「金钟罩体质」｜你的 TPTI 类型是什么？",
-  knowledge_online: "我测出了「嘴强王者体质」｜差一点就满级了，你也来测？",
-  steady_learner: "我测出了「养成系体质」｜你来看看自己属于哪一型？",
-  pitfall_tripper: "我测出了「精准踩雷体质」｜这些防结核误区你中招了吗？",
-  delay_observer: "我测出了「忍者硬抗体质」｜咳两周还观望可不太行。",
-  need_recharge: "我测出了「脆皮裸奔体质」｜你的防结核知识库该更新了。"
+  action_guard: "我的 TPTI 结果类型为「金钟罩体质」｜核心知识掌握较稳",
+  knowledge_online: "我的 TPTI 结果类型为「理论派体质」｜知识基础较好，判断仍可加强",
+  steady_learner: "我的 TPTI 结果类型为「稳进型体质」｜正在逐步建立稳定认知",
+  pitfall_tripper: "我的 TPTI 评估提示我需要重点纠正常见误区",
+  delay_observer: "我的 TPTI 评估提示我需要更早识别症状并及时检查",
+  need_recharge: "我的 TPTI 评估提示我需要先补核心基础知识"
 }
+
+const SHARE_TITLE_SUFFIX = "查看你的 TPTI 防痨体质鉴定结果"
 
 /**
  * Build share title based on result type
@@ -20,11 +22,15 @@ const SHARE_TITLE_MAP = {
  * @returns {string} Share title text
  */
 function buildShareTitle(resultName, levelTitle, resultType) {
-  if (resultType && SHARE_TITLE_MAP[resultType]) {
-    return SHARE_TITLE_MAP[resultType]
+  if (resultType === 'result_pending') {
+    return '我的 TPTI 评估结果尚未生成，欢迎你也来完成这次防痨体质鉴定。'
   }
 
-  return `我测出了「${resultName}」｜当前段位：${levelTitle}，你也来试试？`
+  if (resultType && SHARE_TITLE_MAP[resultType]) {
+    return `${SHARE_TITLE_MAP[resultType]}｜${SHARE_TITLE_SUFFIX}`
+  }
+
+  return `我的 TPTI 结果类型为「${resultName}」｜知识水平：${levelTitle}，欢迎你也来查看`
 }
 
 /**

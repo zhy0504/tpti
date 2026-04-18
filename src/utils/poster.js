@@ -4,12 +4,13 @@
  */
 
 import QRCode from 'qrcode'
+import { pageConfig } from '@/data/page-config.js'
 
 /**
  * Poster dimensions (mobile-friendly aspect ratio)
  */
 const POSTER_WIDTH = 375
-const POSTER_HEIGHT = 667
+const POSTER_HEIGHT = 600
 
 /**
  * Export pixel ratio for high-definition output
@@ -152,9 +153,25 @@ async function createPosterCanvas(result, shareTitle) {
   ctx.fillStyle = COLORS.white
   ctx.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT)
 
+  const cardX = 18
+  const cardY = 18
+  const cardWidth = POSTER_WIDTH - 36
+  const cardHeight = POSTER_HEIGHT - 36
+
+  ctx.fillStyle = '#f8fbfb'
+  ctx.beginPath()
+  ctx.roundRect(cardX, cardY, cardWidth, cardHeight, 24)
+  ctx.fill()
+
+  ctx.strokeStyle = 'rgba(15, 118, 110, 0.08)'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.roundRect(cardX, cardY, cardWidth, cardHeight, 24)
+  ctx.stroke()
+
   // Result image
-  const imageY = 24
-  const imageHeight = 240
+  const imageY = 34
+  const imageHeight = 196
   const imagePadding = 24
 
   try {
@@ -162,12 +179,12 @@ async function createPosterCanvas(result, shareTitle) {
     const imgRatio = img.width / img.height
     const imgDrawWidth = POSTER_WIDTH - (imagePadding * 2)
     const imgDrawHeight = imgDrawWidth / imgRatio
-    const imageCardHeight = imgDrawHeight + 16
+    const imageCardHeight = Math.min(imgDrawHeight + 16, imageHeight)
 
     // Draw image background/card
-    ctx.fillStyle = '#fafbfc'
+    ctx.fillStyle = '#f4f8fa'
     ctx.beginPath()
-    ctx.roundRect(imagePadding, imageY, imgDrawWidth, imageCardHeight, 12)
+    ctx.roundRect(imagePadding, imageY, imgDrawWidth, imageCardHeight, 18)
     ctx.fill()
 
     // Draw image
@@ -176,73 +193,81 @@ async function createPosterCanvas(result, shareTitle) {
       imagePadding + 8,
       imageY + 8,
       imgDrawWidth - 16,
-      imgDrawHeight
+      Math.min(imgDrawHeight, imageCardHeight - 16)
     )
   } catch (e) {
     // Fallback: draw placeholder
     ctx.fillStyle = COLORS.accent
     ctx.beginPath()
-    ctx.roundRect(imagePadding, imageY, POSTER_WIDTH - imagePadding * 2, imageHeight, 12)
+    ctx.roundRect(imagePadding, imageY, POSTER_WIDTH - imagePadding * 2, imageHeight, 18)
     ctx.fill()
 
     ctx.fillStyle = COLORS.textLight
     ctx.font = '14px sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText('结果图片', POSTER_WIDTH / 2, imageY + imageHeight / 2)
+    ctx.fillText('评估结果插图', POSTER_WIDTH / 2, imageY + imageHeight / 2)
   }
 
-  // Header title
-  const badgeY = imageY + imageHeight + 32
-  ctx.fillStyle = COLORS.primary
-  ctx.font = 'bold 11px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('TPTI · Tuberculosis Prevention Type Indicator', POSTER_WIDTH / 2, badgeY + 8)
-
-  ctx.fillStyle = COLORS.text
-  ctx.font = 'bold 22px sans-serif'
-  ctx.fillText('防痨体质鉴定', POSTER_WIDTH / 2, badgeY + 38)
-
   // Result name
-  const nameY = badgeY + 78
+  const nameY = imageY + imageHeight + 44
   ctx.fillStyle = COLORS.text
-  ctx.font = 'bold 22px sans-serif'
+  ctx.font = 'bold 24px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText(`你是：${result.resultName}`, POSTER_WIDTH / 2, nameY)
+  ctx.fillText(result.resultName, POSTER_WIDTH / 2, nameY)
 
-  // One-liner / promotional text
-  const llinerY = nameY + 32
+  // Evaluation / one-liner
+  const llinerY = nameY + 34
   ctx.fillStyle = COLORS.primary
   ctx.font = '14px sans-serif'
-  drawWrappedText(ctx, result.oneLiner || shareTitle, POSTER_WIDTH / 2, llinerY, POSTER_WIDTH - 72, 22, 3)
-
-  // Divider
-  const dividerY = llinerY + 58
-  ctx.strokeStyle = COLORS.divider
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  ctx.moveTo(imagePadding, dividerY)
-  ctx.lineTo(POSTER_WIDTH - imagePadding, dividerY)
-  ctx.stroke()
+  drawWrappedText(ctx, result.oneLiner || shareTitle, POSTER_WIDTH / 2, llinerY, POSTER_WIDTH - 72, 22, 2)
 
   // Level and score info
-  const infoY = dividerY + 20
-  ctx.fillStyle = COLORS.textLight
-  ctx.font = '13px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText(`当前段位：${result.levelTitle}  |  得分：${result.score}/${result.totalScore}`, POSTER_WIDTH / 2, infoY)
+  const infoCardY = llinerY + 48
+  const infoCardX = 34
+  const infoCardWidth = POSTER_WIDTH - 68
+  const infoCardHeight = 68
 
-  // QR Code section
-  const qrSectionY = infoY + 32
-  const homeUrl = getHomeUrl()
-
-  // QR code background card
-  ctx.fillStyle = '#f8fafc'
+  ctx.fillStyle = '#ffffff'
   ctx.beginPath()
-  ctx.roundRect(imagePadding, qrSectionY, POSTER_WIDTH - imagePadding * 2, 140, 12)
+  ctx.roundRect(infoCardX, infoCardY, infoCardWidth, infoCardHeight, 18)
   ctx.fill()
 
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)'
+  ctx.beginPath()
+  ctx.roundRect(infoCardX, infoCardY, infoCardWidth, infoCardHeight, 18)
+  ctx.stroke()
+
+  ctx.fillStyle = COLORS.textLight
+  ctx.font = '12px sans-serif'
+  ctx.textAlign = 'left'
+  ctx.fillText('知识水平', infoCardX + 18, infoCardY + 24)
+  ctx.fillText('评估得分', infoCardX + 190, infoCardY + 24)
+
+  ctx.fillStyle = COLORS.text
+  ctx.font = 'bold 15px sans-serif'
+  ctx.fillText(result.levelTitle, infoCardX + 18, infoCardY + 48)
+  ctx.fillText(`${result.score}/${result.totalScore}`, infoCardX + 190, infoCardY + 48)
+
+  // QR Code section
+  const qrSectionY = infoCardY + infoCardHeight + 18
+  const homeUrl = getHomeUrl()
+  const qrCardX = infoCardX
+  const qrCardWidth = infoCardWidth
+
+  // QR code background card
+  ctx.fillStyle = '#f4f8fa'
+  ctx.beginPath()
+  ctx.roundRect(qrCardX, qrSectionY, qrCardWidth, 126, 18)
+  ctx.fill()
+
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)'
+  ctx.lineWidth = 1
+  ctx.beginPath()
+  ctx.roundRect(qrCardX, qrSectionY, qrCardWidth, 126, 18)
+  ctx.stroke()
+
   // Generate and draw QR code
-  const qrSize = 90
+  const qrSize = 72
   const qrX = POSTER_WIDTH / 2 - qrSize / 2
 
   try {
@@ -256,18 +281,11 @@ async function createPosterCanvas(result, shareTitle) {
   }
 
   // CTA text below QR
-  const ctaY = qrSectionY + 115
-  ctx.fillStyle = COLORS.text
-  ctx.font = 'bold 12px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('长按识别二维码参与测试', POSTER_WIDTH / 2, ctaY)
-
-  // Bottom URL
-  const urlY = qrSectionY + 132
+  const ctaY = qrSectionY + 110
   ctx.fillStyle = COLORS.textLight
-  ctx.font = '11px sans-serif'
+  ctx.font = '600 11px sans-serif'
   ctx.textAlign = 'center'
-  ctx.fillText(homeUrl, POSTER_WIDTH / 2, urlY)
+  ctx.fillText('长按识别二维码，一起来评估吧', POSTER_WIDTH / 2, ctaY)
 
   return canvas
 }
@@ -293,7 +311,7 @@ function canvasToBlob(canvas, type = 'image/png', quality = 0.92) {
  * @param {HTMLCanvasElement} canvas - Canvas element
  * @param {string} filename - Download filename
  */
-async function downloadCanvas(canvas, filename = 'tpti-result.png') {
+async function downloadCanvas(canvas, filename = 'tpti-report.png') {
   const url = canvas.toDataURL('image/png')
   const link = document.createElement('a')
   link.download = filename
@@ -332,7 +350,7 @@ async function sharePosterFile(blob, title, text) {
     return false
   }
 
-  const file = new File([blob], 'tpti-result.png', { type: 'image/png' })
+  const file = new File([blob], 'tpti-report.png', { type: 'image/png' })
 
   if (navigator.canShare({ files: [file] })) {
     await navigator.share({
@@ -359,7 +377,7 @@ export async function sharePoster(result, shareTitle) {
 
     if (shouldPreferDirectDownload()) {
       await downloadCanvas(canvas)
-      return { success: true, message: '已下载高清海报图片，请直接发送该图片' }
+      return { success: true, message: '评估结果图已下载，可直接发送图片继续分享。' }
     }
 
     // Try native share with file first
@@ -367,21 +385,21 @@ export async function sharePoster(result, shareTitle) {
     const shared = await sharePosterFile(blob, shareTitle, result.oneLiner)
 
     if (shared) {
-      return { success: true, message: '已通过系统分享海报' }
+      return { success: true, message: '已调起系统分享，可直接发送这张评估结果图。' }
     }
 
     // Fallback: try clipboard copy
     const copied = await copyCanvasToClipboard(canvas)
     if (copied) {
-      return { success: true, message: '已复制海报到剪贴板，请自行粘贴使用' }
+      return { success: true, message: '评估结果图已复制到剪贴板，可直接粘贴发送。' }
     }
 
     // Final fallback: download
     await downloadCanvas(canvas)
-    return { success: true, message: '已下载海报图片' }
+    return { success: true, message: '评估结果图已下载，可在相册或下载目录中查看。' }
   } catch (error) {
     console.error('Poster generation failed:', error)
-    return { success: false, message: '海报生成失败，请重试' }
+    return { success: false, message: '评估结果图生成未成功，请稍后重试。' }
   }
 }
 
