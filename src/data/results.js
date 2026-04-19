@@ -70,8 +70,8 @@ export const results = {
     },
     {
       type: "delay_observer",
-      name: "延误警惕型体质",
-      imagePath: "/img/延误警惕型体质.webp",
+      name: "警觉不足型体质",
+      imagePath: "/img/警觉不足型体质.webp",
       spotlight: "当前最需要改善的是识别症状后尽早采取检查行动。",
       focusLabel: "行动重点",
       focusText: "你并非完全缺乏知识，而是在是否该及时检查这件事上更容易犹豫，这会直接影响实际应对。",
