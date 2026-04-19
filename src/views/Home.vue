@@ -33,21 +33,48 @@
         </div>
       </section>
 
+      <section class="card card--subtle participation-card">
+        <div class="participation-card-copy">
+          <p class="participation-line">
+            您是今天第
+            <strong class="participation-number">{{ participationDisplay.todayRankText }}</strong>
+            位参与评估者，总第
+            <strong class="participation-number">{{ participationDisplay.totalRankText }}</strong>
+            位参与评估者
+          </p>
+          <p class="participation-line">
+            今日共有
+            <strong class="participation-number">{{ participationDisplay.todayTotalCountText }}</strong>
+            位完成评估，总共有
+            <strong class="participation-number">{{ participationDisplay.overallTotalCountText }}</strong>
+            位完成评估
+          </p>
+        </div>
+      </section>
+
     </main>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { fetchParticipationSummary, syncPendingParticipation } from '@/api/participation.js'
 import { useRouter } from 'vue-router'
 import { pageConfig } from '@/data/page-config.js'
 import { quiz } from '@/data/quiz.js'
+import { buildParticipationDisplay } from '@/utils/participationDisplay.js'
 import { matchesQuizConfig } from '@/utils/quizSelection.js'
-import { clearSession, getSession } from '@/utils/storage.js'
+import { clearSession, getLastResult, getSession, saveLastResult } from '@/utils/storage.js'
 
 const router = useRouter()
 const config = pageConfig.home
 const hasSession = ref(false)
+const participationSummary = ref({
+  day: '',
+  todayTotalCount: 0,
+  overallTotalCount: 0
+})
+const lastResult = ref(null)
 
 const startButtonText = computed(() => {
   if (hasSession.value) {
@@ -57,16 +84,45 @@ const startButtonText = computed(() => {
   return config.startButtonText
 })
 
-onMounted(() => {
+const participationDisplay = computed(() => {
+  return buildParticipationDisplay({
+    summary: participationSummary.value,
+    lastResult: lastResult.value
+  })
+})
+
+onMounted(async () => {
   const session = getSession()
+  const storedResult = getLastResult()
 
   if (!matchesQuizConfig(session, quiz)) {
     clearSession()
     hasSession.value = false
-    return
+  } else {
+    hasSession.value = true
   }
 
-  hasSession.value = true
+  if (storedResult?.participationSyncStatus === 'pending') {
+    try {
+      const syncedResult = await syncPendingParticipation(storedResult)
+      saveLastResult(syncedResult)
+      lastResult.value = syncedResult
+    } catch {
+      lastResult.value = storedResult
+    }
+  } else {
+    lastResult.value = storedResult
+  }
+
+  try {
+    participationSummary.value = await fetchParticipationSummary()
+  } catch {
+    participationSummary.value = {
+      day: '',
+      todayTotalCount: 0,
+      overallTotalCount: 0
+    }
+  }
 })
 
 function onStart() {
@@ -156,6 +212,28 @@ function restartQuiz() {
   margin-top: 2px;
 }
 
+.participation-card {
+  padding: 20px 22px;
+}
+
+.participation-card-copy {
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+
+.participation-line {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  font-size: 0.95rem;
+}
+
+.participation-number {
+  color: var(--primary-strong);
+  font-weight: 800;
+}
+
 @media (min-width: 960px) {
   .home-page {
     min-height: calc(100vh - 136px);
@@ -163,6 +241,10 @@ function restartQuiz() {
 
   .home-hero-card {
     padding: 40px 42px;
+  }
+
+  .participation-card {
+    padding: 22px 28px;
   }
 }
 
