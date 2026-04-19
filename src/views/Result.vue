@@ -71,11 +71,13 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { syncPendingParticipation } from '@/api/participation.js'
 import { useRouter } from 'vue-router'
 import ResultCard from '@/components/ResultCard.vue'
 import { quiz as quizData } from '@/data/quiz.js'
 import { results as resultDefinitions } from '@/data/results.js'
 import { calculateQuizResult } from '@/utils/calcResult.js'
+import { preserveStoredResultMetadata } from '@/utils/resultSnapshot.js'
 import { buildShareTitle } from '@/utils/share.js'
 import { sharePoster } from '@/utils/poster.js'
 import { clearLastResult, getLastResult, saveLastResult } from '@/utils/storage.js'
@@ -121,8 +123,25 @@ const resultPageThemeClass = computed(() => {
   return RESULT_THEME_MAP[result.value?.resultType] || 'result-page--default'
 })
 
-onMounted(() => {
-  result.value = getDisplayResult(getLastResult())
+onMounted(async () => {
+  const displayResult = getDisplayResult(getLastResult())
+  result.value = displayResult
+
+  if (!displayResult) {
+    return
+  }
+
+  if (displayResult.participationSyncStatus !== 'pending') {
+    return
+  }
+
+  try {
+    const syncedResult = await syncPendingParticipation(displayResult)
+    saveLastResult(syncedResult)
+    result.value = syncedResult
+  } catch {
+    result.value = displayResult
+  }
 })
 
 function retakeQuiz() {
@@ -163,14 +182,11 @@ function getDisplayResult(storedResult) {
     levelTitles: resultDefinitions.levelTitles
   })
 
-  const nextResult = {
-    ...refreshedResult,
-    quizVersion: quizData.version,
-    totalQuestions: quizData.totalQuestions,
-    questionsPerDimension: quizData.questionsPerDimension,
-    questions: storedResult.questions,
-    userAnswers: storedResult.userAnswers
-  }
+  const nextResult = preserveStoredResultMetadata({
+    storedResult,
+    refreshedResult,
+    quizData
+  })
 
   saveLastResult(nextResult)
   return nextResult

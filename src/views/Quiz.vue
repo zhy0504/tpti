@@ -36,7 +36,7 @@
             <button
               class="button button-primary nav-btn"
               type="button"
-              :disabled="!selectedOptionKey"
+              :disabled="!selectedOptionKey || isSubmitting"
               @click="goNextOrSubmit"
             >
               {{ nextButtonText }}
@@ -53,10 +53,12 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { recordParticipationCompletion } from '@/api/participation.js'
 import ProgressBar from '@/components/ProgressBar.vue'
 import QuestionCard from '@/components/QuestionCard.vue'
 import { quiz as quizData } from '@/data/quiz.js'
 import { results } from '@/data/results.js'
+import { buildStoredResult } from '@/utils/resultSnapshot.js'
 import { calculateQuizResult } from '@/utils/calcResult.js'
 import { matchesQuizConfig, selectBalancedQuestions } from '@/utils/quizSelection.js'
 import { clearSession, getSession, saveLastResult, saveSession } from '@/utils/storage.js'
@@ -66,6 +68,8 @@ const currentIndex = ref(0)
 const selectedQuestions = ref([])
 const userAnswers = ref([])
 const statusMessage = ref('')
+const isSubmitting = ref(false)
+const submissionId = ref('')
 
 const currentQuestion = computed(() => selectedQuestions.value[currentIndex.value] ?? null)
 const currentDisplayIndex = computed(() => currentIndex.value + 1)
@@ -88,6 +92,10 @@ const selectedOptionKey = computed(() => {
 const nextButtonText = computed(() => {
   const isLastQuestion = currentIndex.value === selectedQuestions.value.length - 1
 
+  if (isLastQuestion && isSubmitting.value) {
+    return '生成结果中...'
+  }
+
   if (isLastQuestion) {
     return '查看结果'
   }
@@ -106,6 +114,12 @@ function restoreOrInitializeQuiz() {
     selectedQuestions.value = session.questions
     currentIndex.value = session.currentIndex
     userAnswers.value = session.userAnswers
+    submissionId.value = session.submissionId || createSubmissionId()
+
+    if (!session.submissionId) {
+      persistSession()
+    }
+
     return
   }
 
@@ -163,6 +177,7 @@ function initializeQuiz() {
   currentIndex.value = 0
   userAnswers.value = []
   statusMessage.value = ''
+  submissionId.value = createSubmissionId()
   persistSession()
 }
 
@@ -192,6 +207,10 @@ function goPrevious() {
 }
 
 function goNextOrSubmit() {
+  if (isSubmitting.value) {
+    return
+  }
+
   if (!selectedOptionKey.value) {
     statusMessage.value = '请选择一个答案后继续。'
     return
@@ -209,22 +228,46 @@ function goNextOrSubmit() {
   persistSession()
 }
 
-function submitQuiz() {
+async function submitQuiz() {
+  if (isSubmitting.value) {
+    return
+  }
+
+  isSubmitting.value = true
+  statusMessage.value = ''
+
   const result = calculateQuizResult({
     questions: selectedQuestions.value,
     userAnswers: userAnswers.value,
     resultConfigs: results.resultTypes,
     levelTitles: results.levelTitles
   })
+  const participationCompletedAt = new Date().toISOString()
+  let participationSnapshot = null
+  let participationSyncStatus = 'pending'
 
-  saveLastResult({
-    ...result,
-    quizVersion: quizData.version,
-    totalQuestions: quizData.totalQuestions,
-    questionsPerDimension: quizData.questionsPerDimension,
+  try {
+    participationSnapshot = await recordParticipationCompletion({
+      submissionId: submissionId.value,
+      completedAt: participationCompletedAt
+    })
+    participationSyncStatus = 'success'
+  } catch {
+    participationSyncStatus = 'pending'
+  }
+
+  const storedResult = buildStoredResult({
+    result,
+    quizData,
     questions: selectedQuestions.value,
-    userAnswers: userAnswers.value
+    userAnswers: userAnswers.value,
+    submissionId: submissionId.value,
+    participationCompletedAt,
+    participationSnapshot,
+    participationSyncStatus
   })
+
+  saveLastResult(storedResult)
   clearSession()
   router.push('/result')
 }
@@ -234,14 +277,23 @@ function persistSession() {
     return
   }
 
+  if (!submissionId.value) {
+    submissionId.value = createSubmissionId()
+  }
+
   saveSession({
     quizVersion: quizData.version,
     totalQuestions: quizData.totalQuestions,
     questionsPerDimension: quizData.questionsPerDimension,
     questions: selectedQuestions.value,
     currentIndex: currentIndex.value,
-    userAnswers: userAnswers.value
+    userAnswers: userAnswers.value,
+    submissionId: submissionId.value
   })
+}
+
+function createSubmissionId() {
+  return crypto.randomUUID()
 }
 </script>
 
