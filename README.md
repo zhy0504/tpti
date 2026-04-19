@@ -44,12 +44,17 @@ npm run build
 
 ## Docker 部署
 
-### A. 本地构建与运行
+当前仓库提供两份 Compose 配置：
+
+- `docker-compose.local.yml`：本地源码构建版
+- `docker-compose.yml`：服务器 / dpanel / VPS 镜像部署版（直接拉 GHCR，不依赖本地 `./api` 源码目录）
+
+### A. 本地源码构建与运行
 
 从源码直接构建并启动双服务：
 
 ```bash
-docker compose up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 ```
 
 访问 http://localhost:6666
@@ -58,7 +63,7 @@ docker compose up -d --build
 
 ### B. GHCR 镜像部署
 
-`docker-compose.yml` 同时声明了本地构建上下文和 GHCR 镜像标签：`docker compose up -d --build` 会走本地构建，`docker compose pull && docker compose up -d` 可用于拉取并启动 `ghcr.io/zhy0504/tpti-h5:latest` 与 `ghcr.io/zhy0504/tpti-h5-api:latest`。
+`docker-compose.yml` 是服务器镜像部署版，只声明 `ghcr.io/zhy0504/tpti-h5:latest` 与 `ghcr.io/zhy0504/tpti-h5-api:latest`，适合 dpanel / VPS / GHCR 拉镜像部署。
 
 **方式一：docker compose（推荐）**
 
@@ -87,7 +92,7 @@ docker compose down
    ```
 
 3. 确保已安装 Docker 和 Docker Compose
-4. 拉取最新镜像并启动服务
+4. 使用默认的 `docker-compose.yml` 拉取最新镜像并启动服务
 
    ```bash
    docker compose pull
@@ -96,9 +101,11 @@ docker compose down
 
 5. 访问 `http://<VPS_IP>:6666`
 
-如需修改映射端口，编辑 `docker-compose.yml` 中的 `ports` 配置后重新执行第 4 步。
+如需修改映射端口，编辑所使用的 Compose 文件中的 `ports` 配置后重新执行第 4 步。
 
 如需保留参与人数统计，请不要删除 `participation_data` volume。
+
+如果你使用 dpanel 或其他面板部署，请优先使用默认的 `docker-compose.yml`，因为它不包含 `build.context`，不会要求服务器目录中存在本地 `./api` 源码。
 
 如果你使用自定义反向代理或非 Compose 方式部署，请确保前端页面与 `/api` 服务保持同源，否则首页共享计数与提交上报不会工作。
 

@@ -1,6 +1,7 @@
 services:
   h5:
-    image: ghcr.io/zhy0504/tpti-h5:latest
+    build:
+      context: .
     container_name: tpti-h5
     ports:
       - "6666:80"
@@ -10,7 +11,8 @@ services:
     restart: unless-stopped
 
   api:
-    image: ghcr.io/zhy0504/tpti-h5-api:latest
+    build:
+      context: ./api
     container_name: tpti-h5-api
     environment:
       PORT: 3001
