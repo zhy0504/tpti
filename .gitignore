@@ -9,3 +9,8 @@ Thumbs.db
 .idea/
 .env
 .env.*
+/.tmp_image_reencode/
+api/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
