@@ -31,11 +31,6 @@
       <p class="footer-notice knowledge-footer-notice">{{ knowledgeData.footerNotice }}</p>
 
       <section class="card card--action knowledge-actions-card">
-        <div class="knowledge-actions-copy">
-          <h2 class="title-md knowledge-actions-title">下一步</h2>
-          <p class="knowledge-actions-text">完成阅读后，可直接开始 TPTI 评估，或先返回首页。</p>
-        </div>
-
         <div class="button-row knowledge-actions">
           <button class="button button-primary" type="button" @click="goQuiz">开始评估</button>
           <button class="button button-ghost" type="button" @click="goHome">返回首页</button>
@@ -167,26 +162,18 @@ function goHome() {
   align-items: center;
 }
 
-.knowledge-actions-copy {
-  min-width: 0;
-}
-
-.knowledge-actions-title {
-  margin: 0;
-}
-
-.knowledge-actions-text {
-  margin: 8px 0 0;
-  max-width: 32rem;
-  line-height: 1.7;
-  color: var(--text-secondary);
-}
-
 .knowledge-actions {
   margin-top: 0;
 }
 
 @media (min-width: 960px) {
+  .knowledge-intro-copy,
+  .knowledge-intro,
+  .knowledge-footer-notice {
+    max-width: none;
+    white-space: nowrap;
+  }
+
   .knowledge-section-list {
     gap: 18px;
   }
@@ -200,12 +187,12 @@ function goHome() {
   }
 
   .knowledge-actions-card {
-    grid-template-columns: minmax(0, 1fr) minmax(360px, 520px);
-    gap: 24px;
+    justify-items: center;
   }
 
   .knowledge-actions {
     max-width: none;
+    width: min(100%, 520px);
   }
 }
 </style>
