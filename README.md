@@ -2,7 +2,7 @@
 
 TPTI（Tuberculosis Prevention Type Indicator，防痨体质鉴定）是一款面向结核病防治知识科普的 H5 评估应用。用户完成按维度均衡抽取的 10 道题后，可以获得自己的 TPTI 结果类型、评估得分、知识水平、错题回顾和重点建议。
 
-应用当前包含首页、答题页、结果页和知识指南四个核心模块，支持答题进度持久化、结果回看，以及基于浏览器原生分享能力的结果分享。项目同时提供 Docker / docker compose / VPS 部署方案，适合直接作为独立前端项目运行和发布。
+应用当前包含首页、答题页、结果页和知识指南四个核心模块，支持答题进度持久化、结果回看、全站共享参与人数统计，以及基于浏览器原生分享能力的结果分享。由于共享计数依赖同源 `/api` 服务，推荐始终以“前端 nginx + API + SQLite”双服务方式部署。
 
 ---
 
@@ -13,7 +13,19 @@ npm install
 npm run dev
 ```
 
+另开一个终端启动参与统计 API：
+
+```bash
+cd api
+npm install
+npm run dev
+```
+
+默认数据库会写入 `api/data/participation.sqlite`。
+
 访问 http://localhost:3000
+
+API 本地默认监听 http://localhost:3001
 
 ---
 
@@ -21,10 +33,12 @@ npm run dev
 
 ```bash
 npm install
+npm --prefix api install
+npm run test
 npm run build
 ```
 
-产物输出到 `dist/`，可直接用任意静态服务器托管。
+`dist/` 只包含前端静态资源；如果你需要首页共享参与人数统计，生产环境还必须同时提供同源 `/api` 服务与持久化数据库。
 
 ---
 
@@ -32,52 +46,36 @@ npm run build
 
 ### A. 本地构建与运行
 
-从源码构建镜像：
+从源码直接构建并启动双服务：
 
 ```bash
-docker build -t tpti-h5 .
-docker run -d --name tpti-h5 -p 8080:80 tpti-h5
+docker compose up -d --build
 ```
 
-访问 http://localhost:8080
+访问 http://localhost:6666
 
 ---
 
 ### B. GHCR 镜像部署
 
-`docker-compose.yml` 默认使用 GHCR 镜像 `ghcr.io/zhy0504/tpti-h5:latest`。
+`docker-compose.yml` 同时声明了本地构建上下文和 GHCR 镜像标签：`docker compose up -d --build` 会走本地构建，`docker compose pull && docker compose up -d` 可用于拉取并启动 `ghcr.io/zhy0504/tpti-h5:latest` 与 `ghcr.io/zhy0504/tpti-h5-api:latest`。
 
 **方式一：docker compose（推荐）**
 
 ```bash
+docker compose pull
 docker compose up -d
 ```
 
-访问 http://localhost:8080
+访问 http://localhost:6666
+
+参与统计数据保存在 Docker volume `participation_data` 中，容器重启后会继续保留。
 
 停止服务：
 
 ```bash
 docker compose down
 ```
-
-**方式二：docker pull + docker run**
-
-```bash
-docker pull ghcr.io/zhy0504/tpti-h5:latest
-docker run -d --name tpti-h5 -p 8080:80 ghcr.io/zhy0504/tpti-h5:latest
-```
-
-访问 http://localhost:8080
-
-停止并删除容器：
-
-```bash
-docker stop tpti-h5
-docker rm tpti-h5
-```
-
----
 
 ## VPS 部署流程
 
@@ -96,9 +94,13 @@ docker rm tpti-h5
    docker compose up -d
    ```
 
-5. 访问 `http://<VPS_IP>:8080`
+5. 访问 `http://<VPS_IP>:6666`
 
 如需修改映射端口，编辑 `docker-compose.yml` 中的 `ports` 配置后重新执行第 4 步。
+
+如需保留参与人数统计，请不要删除 `participation_data` volume。
+
+如果你使用自定义反向代理或非 Compose 方式部署，请确保前端页面与 `/api` 服务保持同源，否则首页共享计数与提交上报不会工作。
 
 ---
 
@@ -106,8 +108,10 @@ docker rm tpti-h5
 
 - Vue 3
 - Vite 5
+- Express 4
+- better-sqlite3
 - nginx 1.25（Docker 运行时）
-- Node 20（构建阶段）
+- Node 20（前端构建与 API 运行）
 
 ---
 

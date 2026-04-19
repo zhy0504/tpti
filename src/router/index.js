@@ -11,11 +11,6 @@ const routes = [
     component: Home
   },
   {
-    path: '/intro',
-    name: 'Intro',
-    redirect: '/'
-  },
-  {
     path: '/quiz',
     name: 'Quiz',
     component: Quiz

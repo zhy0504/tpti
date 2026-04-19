@@ -17,6 +17,3 @@ export {
   saveLastResult,
   getLastResult
 } from './storage.js'
-export { default as calcResultDefault } from './calcResult.js'
-export { default as shareDefault } from './share.js'
-export { default as storageDefault } from './storage.js'
